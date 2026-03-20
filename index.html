@@ -1,1 +1,1676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDL 学习任务拆解助手</title>
+    <style>
+        /* ========== 基础样式 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        :root {
+            /* 主色调 - 清爽蓝色系 */
+            --primary-color: #4A90D9;
+            --primary-light: #E8F2FC;
+            --primary-dark: #3A7BC8;
+            
+            /* 辅助色 */
+            --success-color: #52C41A;
+            --success-light: #F6FFED;
+            --warning-color: #FAAD14;
+            --danger-color: #FF4D4F;
+            --danger-light: #FFF1F0;
+            --text-primary: #2C3E50;
+            --text-secondary: #5A6D82;
+            --text-muted: #8C99A6;
+            --border-color: #E4E9F0;
+            --bg-light: #F7F9FC;
+            --bg-white: #FFFFFF;
+            
+            /* 阶段颜色 */
+            --phase-1: #52C41A;
+            --phase-2: #FA8C16;
+            --phase-3: #1890FF;
+            --phase-4: #EB2F96;
+            
+            /* 统一字号 */
+            --font-size-xs: 12px;
+            --font-size-sm: 14px;
+            --font-size-base: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 20px;
+            --font-size-2xl: 24px;
+            --font-size-3xl: 32px;
+            
+            /* 统一间距 */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-2xl: 48px;
+            
+            /* 圆角 */
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-light);
+            min-height: 100vh;
+            padding: var(--spacing-2xl) var(--spacing-lg);
+        }
+
+        /* ========== 容器布局 ========== */
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+        }
+
+        /* ========== 页面头部 ========== */
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            padding: var(--spacing-xl) 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #6BA3E0 100%);
+            border-radius: var(--radius-xl);
+            color: var(--bg-white);
+        }
+
+        .header h1 {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            color: var(--bg-white);
+            margin-bottom: var(--spacing-md);
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header .subtitle {
+            font-size: var(--font-size-lg);
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: rgba(255,255,255,0.15);
+            border-radius: var(--radius-lg);
+            display: inline-block;
+            backdrop-filter: blur(4px);
+        }
+
+        .header p {
+            font-size: var(--font-size-base);
+            color: rgba(255,255,255,0.8);
+            margin-top: var(--spacing-md);
+        }
+
+        /* ========== 卡片样式 ========== */
+        .card {
+            background: var(--bg-white);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .card-title .icon {
+            font-size: var(--font-size-lg);
+        }
+
+        /* ========== 进度条区域 ========== */
+        .progress-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .progress-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .progress-percent {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .progress-bar-wrapper {
+            background: var(--bg-light);
+            border-radius: var(--radius-lg);
+            height: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color) 0%, #6BA3E0 100%);
+            border-radius: var(--radius-lg);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-sm);
+        }
+
+        .progress-stat {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+        }
+
+        .progress-stat strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* ========== 表单样式 ========== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-lg);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-label {
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .form-label .required {
+            color: var(--danger-color);
+            margin-left: 2px;
+        }
+
+        .form-input,
+        .form-select {
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+            background: var(--bg-white);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .form-input.error,
+        .form-select.error {
+            border-color: var(--danger-color);
+            box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1);
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: var(--font-size-xs);
+            margin-top: var(--spacing-xs);
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .form-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235A6D82' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        /* ========== 复选框样式 ========== */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) 0;
+        }
+
+        .checkbox-input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+
+        .checkbox-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* ========== 按钮样式 ========== */
+        .btn-group {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            flex: 1;
+            min-width: 140px;
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease, transform 0.1s ease;
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-primary {
+            color: var(--bg-white);
+            background: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(74, 144, 217, 0.3);
+        }
+
+        .btn-secondary {
+            color: var(--primary-color);
+            background: var(--primary-light);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background: #D4E8FA;
+        }
+
+        .btn-danger {
+            color: var(--danger-color);
+            background: var(--danger-light);
+            border: 1px solid #FFCCC7;
+            flex: none;
+            min-width: auto;
+            padding: var(--spacing-md) var(--spacing-lg);
+        }
+
+        .btn-danger:hover {
+            background: #FFD6D4;
+        }
+
+        /* ========== 统计卡片 ========== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .stat-card {
+            background: var(--bg-light);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-number {
+            font-size: var(--font-size-3xl);
+            font-weight: 600;
+            color: var(--primary-color);
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+
+        /* ========== 阶段区域 ========== */
+        .phase-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .phase-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .phase-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-lg);
+            color: var(--bg-white);
+            flex-shrink: 0;
+        }
+
+        .phase-icon.phase-1 { background: var(--phase-1); }
+        .phase-icon.phase-2 { background: var(--phase-2); }
+        .phase-icon.phase-3 { background: var(--phase-3); }
+        .phase-icon.phase-4 { background: var(--phase-4); }
+
+        .phase-info {
+            flex: 1;
+        }
+
+        .phase-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .phase-duration {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+        }
+
+        /* ========== 任务列表 ========== */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+        }
+
+        .task-item:hover {
+            background: #EEF2F7;
+        }
+
+        .task-item.completed {
+            background: var(--success-light);
+            border-color: #B7EB8F;
+        }
+
+        .task-item.completed .task-content {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--success-color);
+            flex-shrink: 0;
+        }
+
+        .task-checkbox:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .task-date {
+            background: var(--primary-color);
+            color: var(--bg-white);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .task-date.rest {
+            background: var(--text-muted);
+        }
+
+        .task-content {
+            flex: 1;
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+        }
+
+        .task-time {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .rest-badge {
+            background: var(--text-muted);
+            color: var(--bg-white);
+            padding: 2px var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            margin-left: auto;
+        }
+
+        /* ========== 提示框 ========== */
+        .tip-box {
+            background: #FFFBE6;
+            border: 1px solid #FFE58F;
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+
+        .tip-title {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            color: #D48806;
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .tip-content {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* ========== 学习建议模块 ========== */
+        .suggestion-section {
+            background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+            border: 1px solid #C8E6C9;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .suggestion-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px dashed #A5D6A7;
+        }
+
+        .suggestion-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .suggestion-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: #2E7D32;
+        }
+
+        .suggestion-subtitle {
+            font-size: var(--font-size-sm);
+            color: #558B2F;
+            margin-top: var(--spacing-xs);
+        }
+
+        .suggestion-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .suggestion-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .suggestion-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15);
+        }
+
+        .suggestion-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .suggestion-num {
+            width: 28px;
+            height: 28px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .suggestion-text {
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .suggestion-text strong {
+            color: #2E7D32;
+        }
+
+        /* ========== 存储状态提示 ========== */
+        .storage-hint {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: var(--spacing-sm);
+        }
+
+        /* ========== 工具类 ========== */
+        .hidden {
+            display: none;
+        }
+
+        /* ========== 响应式适配 ========== */
+        @media (max-width: 640px) {
+            body {
+                padding: var(--spacing-lg) var(--spacing-md);
+            }
+            
+            .header h1 {
+                font-size: var(--font-size-2xl);
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card {
+                padding: var(--spacing-lg);
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn-danger {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面头部 -->
+        <header class="header">
+            <h1>DDL 学习任务拆解助手</h1>
+            <div class="subtitle">帮助大学生拆解大任务，减少拖延</div>
+            <p>轻松规划学习进度，高效完成学业任务</p>
+        </header>
+
+        <!-- 输入表单卡片 -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <span class="icon">📋</span>
+                    填写任务信息
+                </h2>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label class="form-label" for="taskName">任务名称<span class="required">*</span></label>
+                    <input type="text" class="form-input" id="taskName" placeholder="例如：期末论文、课程设计、毕业设计">
+                    <div class="error-message" id="taskNameError">请输入任务名称</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="currentDate">当前日期<span class="required">*</span></label>
+                    <input type="date" class="form-input" id="currentDate">
+                    <div class="error-message" id="currentDateError">请选择当前日期</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="deadline">截止日期<span class="required">*</span></label>
+                    <input type="date" class="form-input" id="deadline">
+                    <div class="error-message" id="deadlineError">请选择截止日期</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="dailyTime">每天可投入学习时间（小时）<span class="required">*</span></label>
+                    <input type="number" class="form-input" id="dailyTime" min="0.5" max="12" step="0.5" value="2" placeholder="建议 1-4 小时">
+                    <div class="error-message" id="dailyTimeError">请输入有效的学习时间（0.5-12小时）</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="difficulty">任务难度</label>
+                    <select class="form-select" id="difficulty">
+                        <option value="easy">简单 - 常规作业</option>
+                        <option value="medium" selected>中等 - 课程论文/小项目</option>
+                        <option value="hard">困难 - 毕业设计/大型项目</option>
+                    </select>
+                </div>
+                
+                <div class="form-group full-width">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox-input" id="skipWeekend" checked>
+                        <label class="checkbox-label" for="skipWeekend">保留周末为休息日（周六、周日不安排任务）</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="generatePlan()">
+                    <span>生成学习计划</span>
+                </button>
+                <button class="btn btn-secondary hidden" id="regenerateBtn" onclick="regeneratePlan()">
+                    <span>重新生成计划</span>
+                </button>
+                <button class="btn btn-danger" onclick="clearAllData()">
+                    <span>清空数据</span>
+                </button>
+            </div>
+            <p class="storage-hint" id="storageHint">数据已自动保存到本地</p>
+        </div>
+
+        <!-- 结果展示卡片 -->
+        <div class="card hidden" id="resultCard">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <span class="icon">📊</span>
+                    计划总览
+                </h2>
+            </div>
+
+            <!-- 进度条区域 -->
+            <div class="progress-section" id="progressSection">
+                <div class="progress-header">
+                    <span class="progress-label">学习进度</span>
+                    <span class="progress-percent" id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar-wrapper">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-stats">
+                    <span class="progress-stat">已完成 <strong id="completedCount">0</strong> 个任务</span>
+                    <span class="progress-stat">共 <strong id="totalCount">0</strong> 个学习任务</span>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalDays">0</div>
+                    <div class="stat-label">总天数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="studyDays">0</div>
+                    <div class="stat-label">学习天数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="suggestTime">0h</div>
+                    <div class="stat-label">建议每日投入</div>
+                </div>
+            </div>
+
+            <div id="planContainer"></div>
+
+            <!-- 学习建议模块 -->
+            <div class="suggestion-section hidden" id="suggestionSection">
+                <div class="suggestion-header">
+                    <div class="suggestion-icon">💡</div>
+                    <div>
+                        <div class="suggestion-title">学习建议</div>
+                        <div class="suggestion-subtitle" id="suggestionSubtitle">根据您的任务难度定制</div>
+                    </div>
+                </div>
+                <ul class="suggestion-list" id="suggestionList">
+                    <!-- 动态生成的学习建议 -->
+                </ul>
+            </div>
+
+            <div class="tip-box">
+                <div class="tip-title">
+                    <span>💡</span>
+                    学习小贴士
+                </div>
+                <p class="tip-content">建议在精力最充沛的时段完成最重要的任务。每学习 45-50 分钟休息 10 分钟，保持专注力。如果某天没完成任务，可以顺延到下一天，不要给自己太大压力！</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 本地存储键名
+        const STORAGE_KEY = 'ddl_assistant_data';
+
+        // 全局任务状态存储
+        let taskCompletionStatus = {};
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            
+            // 设置日期输入的限制
+            document.getElementById('currentDate').max = todayStr;
+            document.getElementById('deadline').min = todayStr;
+            
+            // 从本地存储加载数据
+            loadFromStorage();
+        });
+
+        // ==================== 表单验证功能 ====================
+
+        // 清除错误状态
+        function clearErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(el => el.classList.remove('show'));
+            
+            const inputElements = document.querySelectorAll('.form-input, .form-select');
+            inputElements.forEach(el => el.classList.remove('error'));
+        }
+
+        // 显示错误信息
+        function showError(inputId, errorId) {
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(errorId);
+            if (input) input.classList.add('error');
+            if (error) error.classList.add('show');
+        }
+
+        // 验证表单输入
+        function validateForm() {
+            clearErrors();
+            
+            let isValid = true;
+            const taskName = document.getElementById('taskName').value.trim();
+            const currentDate = document.getElementById('currentDate').value;
+            const deadline = document.getElementById('deadline').value;
+            const dailyTime = parseFloat(document.getElementById('dailyTime').value);
+
+            // 验证任务名称
+            if (!taskName) {
+                showError('taskName', 'taskNameError');
+                isValid = false;
+            }
+
+            // 验证当前日期
+            if (!currentDate) {
+                showError('currentDate', 'currentDateError');
+                isValid = false;
+            }
+
+            // 验证截止日期
+            if (!deadline) {
+                showError('deadline', 'deadlineError');
+                isValid = false;
+            }
+
+            // 验证学习时间（必须为正数且在合理范围内）
+            if (isNaN(dailyTime) || dailyTime <= 0) {
+                showError('dailyTime', 'dailyTimeError');
+                document.getElementById('dailyTimeError').textContent = '学习时间必须为正数';
+                isValid = false;
+            } else if (dailyTime > 12) {
+                showError('dailyTime', 'dailyTimeError');
+                document.getElementById('dailyTimeError').textContent = '学习时间不能超过12小时';
+                isValid = false;
+            } else if (dailyTime < 0.5) {
+                showError('dailyTime', 'dailyTimeError');
+                document.getElementById('dailyTimeError').textContent = '学习时间不能少于0.5小时';
+                isValid = false;
+            }
+
+            // 验证日期逻辑（截止日期必须晚于当前日期）
+            if (currentDate && deadline) {
+                const start = new Date(currentDate);
+                const end = new Date(deadline);
+                
+                // 设置时间为当天的开始，确保只比较日期
+                start.setHours(0, 0, 0, 0);
+                end.setHours(0, 0, 0, 0);
+                
+                if (end < start) {
+                    showError('deadline', 'deadlineError');
+                    document.getElementById('deadlineError').textContent = '截止日期不能早于当前日期';
+                    isValid = false;
+                } else if (end.getTime() === start.getTime()) {
+                    showError('deadline', 'deadlineError');
+                    document.getElementById('deadlineError').textContent = '截止日期必须晚于当前日期';
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        // ==================== 本地存储功能 ====================
+
+        // 保存数据到本地存储
+        function saveToStorage() {
+            const formData = {
+                taskName: document.getElementById('taskName').value,
+                currentDate: document.getElementById('currentDate').value,
+                deadline: document.getElementById('deadline').value,
+                dailyTime: document.getElementById('dailyTime').value,
+                difficulty: document.getElementById('difficulty').value,
+                skipWeekend: document.getElementById('skipWeekend').checked
+            };
+
+            const planData = {
+                totalDays: document.getElementById('totalDays').textContent,
+                studyDays: document.getElementById('studyDays').textContent,
+                suggestTime: document.getElementById('suggestTime').textContent,
+                taskCompletionStatus: taskCompletionStatus,
+                hasPlan: !document.getElementById('resultCard').classList.contains('hidden')
+            };
+
+            const data = {
+                formData: formData,
+                planData: planData,
+                savedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        // 从本地存储加载数据
+        function loadFromStorage() {
+            const dataStr = localStorage.getItem(STORAGE_KEY);
+            
+            if (!dataStr) {
+                // 没有保存的数据，设置默认日期
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+                document.getElementById('currentDate').value = todayStr;
+                return;
+            }
+
+            try {
+                const data = JSON.parse(dataStr);
+                
+                // 恢复表单数据
+                if (data.formData) {
+                    document.getElementById('taskName').value = data.formData.taskName || '';
+                    document.getElementById('currentDate').value = data.formData.currentDate || '';
+                    document.getElementById('deadline').value = data.formData.deadline || '';
+                    document.getElementById('dailyTime').value = data.formData.dailyTime || '2';
+                    document.getElementById('difficulty').value = data.formData.difficulty || 'medium';
+                    document.getElementById('skipWeekend').checked = data.formData.skipWeekend !== false;
+                }
+
+                // 恢复计划和完成状态
+                if (data.planData && data.planData.hasPlan) {
+                    taskCompletionStatus = data.planData.taskCompletionStatus || {};
+                    
+                    // 重新生成计划以恢复任务列表
+                    regeneratePlanFromStorage(data.formData, data.planData);
+                }
+            } catch (e) {
+                console.error('加载数据失败:', e);
+            }
+        }
+
+        // 从存储数据重新生成计划
+        function regeneratePlanFromStorage(formData, planData) {
+            if (!formData.taskName || !formData.currentDate || !formData.deadline) {
+                return;
+            }
+
+            const start = new Date(formData.currentDate);
+            const end = new Date(formData.deadline);
+            
+            // 验证日期是否有效
+            if (end < start) {
+                return;
+            }
+
+            const dailyTime = parseFloat(formData.dailyTime) || 2;
+            const difficulty = formData.difficulty || 'medium';
+            const skipWeekend = formData.skipWeekend !== false;
+
+            // 计算日期范围
+            const allDates = getDatesInRange(start, end);
+            const studyDates = skipWeekend ? allDates.filter(d => !isWeekend(d)) : allDates;
+            const restDates = skipWeekend ? allDates.filter(d => isWeekend(d)) : [];
+
+            // 根据难度调整阶段比例
+            const phaseRatios = getPhaseRatios(difficulty);
+
+            // 生成任务计划
+            const tasks = generateTasks(formData.taskName, studyDates, restDates, phaseRatios, dailyTime, skipWeekend);
+
+            // 更新统计信息
+            document.getElementById('totalDays').textContent = planData.totalDays || allDates.length;
+            document.getElementById('studyDays').textContent = planData.studyDays || studyDates.length;
+            document.getElementById('suggestTime').textContent = planData.suggestTime || dailyTime + 'h';
+
+            // 渲染计划
+            renderPlan(tasks);
+
+            // 渲染学习建议
+            renderSuggestions(difficulty, dailyTime, studyDates.length);
+
+            // 更新进度条
+            updateProgress();
+
+            // 显示结果卡片和重新生成按钮
+            document.getElementById('resultCard').classList.remove('hidden');
+            document.getElementById('regenerateBtn').classList.remove('hidden');
+        }
+
+        // 清空所有数据
+        function clearAllData() {
+            if (!confirm('确定要清空所有数据吗？这将删除已保存的任务信息和完成进度。')) {
+                return;
+            }
+
+            // 清除本地存储
+            localStorage.removeItem(STORAGE_KEY);
+
+            // 重置表单
+            document.getElementById('taskName').value = '';
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            document.getElementById('currentDate').value = todayStr;
+            document.getElementById('deadline').value = '';
+            document.getElementById('dailyTime').value = '2';
+            document.getElementById('difficulty').value = 'medium';
+            document.getElementById('skipWeekend').checked = true;
+
+            // 重置任务状态
+            taskCompletionStatus = {};
+
+            // 隐藏结果卡片和重新生成按钮
+            document.getElementById('resultCard').classList.add('hidden');
+            document.getElementById('regenerateBtn').classList.add('hidden');
+            document.getElementById('suggestionSection').classList.add('hidden');
+
+            // 清空计划容器
+            document.getElementById('planContainer').innerHTML = '';
+
+            // 清除错误状态
+            clearErrors();
+
+            alert('数据已清空！');
+        }
+
+        // ==================== 学习建议功能 ====================
+
+        // 根据难度生成学习建议
+        function generateSuggestions(difficulty, dailyTime, studyDays) {
+            const suggestions = [];
+            
+            // 难度相关建议
+            switch (difficulty) {
+                case 'easy':
+                    suggestions.push('这个任务相对简单，建议保持稳定的学习节奏，按时完成即可');
+                    suggestions.push('每天投入 <strong>' + dailyTime + '小时</strong>，可以较轻松地完成任务');
+                    suggestions.push('注意细节检查，避免因粗心导致的错误');
+                    break;
+                case 'medium':
+                    suggestions.push('中等难度任务需要保持连贯性，建议每天固定时间学习');
+                    suggestions.push('每天投入 <strong>' + dailyTime + '小时</strong>，注意劳逸结合');
+                    suggestions.push('遇到困难及时记录并寻求帮助，不要堆积问题');
+                    break;
+                case 'hard':
+                    suggestions.push('这是一个具有挑战性的任务，需要保持高度的专注和耐心');
+                    suggestions.push('建议每天投入 <strong>' + dailyTime + '小时</strong>，合理安排高强度学习时段');
+                    suggestions.push('遇到瓶颈期要学会调整心态，必要时寻求老师或同学的指导');
+                    suggestions.push('建议预留1-2天的缓冲时间应对突发情况');
+                    break;
+            }
+
+            // 通用建议
+            if (studyDays > 14) {
+                suggestions.push('任务周期较长，建议制作周计划表，跟踪整体进度');
+                suggestions.push('定期回顾已完成的内容，保持学习的连贯性');
+            } else if (studyDays <= 7) {
+                suggestions.push('时间相对紧张，建议集中精力，优先完成核心内容');
+            }
+
+            suggestions.push('每学习45-50分钟后休息10分钟，保持最佳学习效率');
+            suggestions.push('建议在精力最充沛的时段完成最重要的任务');
+
+            return suggestions;
+        }
+
+        // 渲染学习建议
+        function renderSuggestions(difficulty, dailyTime, studyDays) {
+            const suggestionSection = document.getElementById('suggestionSection');
+            const suggestionList = document.getElementById('suggestionList');
+            const suggestionSubtitle = document.getElementById('suggestionSubtitle');
+
+            // 设置副标题
+            const difficultyText = { 'easy': '简单难度任务', 'medium': '中等难度任务', 'hard': '困难任务' };
+            suggestionSubtitle.textContent = difficultyText[difficulty] || '任务建议';
+
+            // 生成建议列表
+            const suggestions = generateSuggestions(difficulty, dailyTime, studyDays);
+            suggestionList.innerHTML = suggestions.map((suggestion, index) => `
+                <li class="suggestion-item">
+                    <span class="suggestion-num">${index + 1}</span>
+                    <span class="suggestion-text">${suggestion}</span>
+                </li>
+            `).join('');
+
+            // 显示建议模块
+            suggestionSection.classList.remove('hidden');
+        }
+
+        // ==================== 生成计划功能 ====================
+
+        // 重新生成计划
+        function regeneratePlan() {
+            // 显示确认对话框
+            if (!confirm('重新生成计划将清空当前的任务进度和已完成状态，确定要继续吗？')) {
+                return;
+            }
+            
+            // 调用生成计划函数
+            generatePlan();
+        }
+
+        // 生成计划主函数
+        function generatePlan() {
+            // 清除之前的错误状态
+            clearErrors();
+
+            const taskName = document.getElementById('taskName').value.trim();
+            const currentDate = document.getElementById('currentDate').value;
+            const deadline = document.getElementById('deadline').value;
+            const dailyTime = parseFloat(document.getElementById('dailyTime').value);
+            const difficulty = document.getElementById('difficulty').value;
+            const skipWeekend = document.getElementById('skipWeekend').checked;
+
+            // 验证输入 - 任务名称
+            if (!taskName) {
+                showError('taskName', 'taskNameError');
+                return;
+            }
+
+            // 验证输入 - 日期
+            if (!currentDate) {
+                showError('currentDate', 'currentDateError');
+                return;
+            }
+
+            if (!deadline) {
+                showError('deadline', 'deadlineError');
+                return;
+            }
+
+            const start = new Date(currentDate);
+            const end = new Date(deadline);
+
+            // 设置时间为当天的开始，确保只比较日期
+            start.setHours(0, 0, 0, 0);
+            end.setHours(0, 0, 0, 0);
+
+            // 验证截止日期必须晚于当前日期
+            if (end < start) {
+                showError('deadline', 'deadlineError');
+                document.getElementById('deadlineError').textContent = '截止日期不能早于当前日期';
+                return;
+            }
+
+            if (end.getTime() === start.getTime()) {
+                showError('deadline', 'deadlineError');
+                document.getElementById('deadlineError').textContent = '截止日期必须晚于当前日期';
+                return;
+            }
+
+            // 验证学习时间必须为正数
+            if (isNaN(dailyTime) || dailyTime <= 0) {
+                showError('dailyTime', 'dailyTimeError');
+                document.getElementById('dailyTimeError').textContent = '学习时间必须为正数';
+                return;
+            }
+
+            if (dailyTime > 12) {
+                showError('dailyTime', 'dailyTimeError');
+                document.getElementById('dailyTimeError').textContent = '学习时间不能超过12小时';
+                return;
+            }
+
+            if (dailyTime < 0.5) {
+                showError('dailyTime', 'dailyTimeError');
+                document.getElementById('dailyTimeError').textContent = '学习时间不能少于0.5小时';
+                return;
+            }
+
+            // 重置任务完成状态
+            taskCompletionStatus = {};
+
+            // 计算日期范围
+            const allDates = getDatesInRange(start, end);
+            const studyDates = skipWeekend ? allDates.filter(d => !isWeekend(d)) : allDates;
+            const restDates = skipWeekend ? allDates.filter(d => isWeekend(d)) : [];
+
+            // 验证是否有可用的学习日
+            if (studyDates.length === 0) {
+                alert('所选日期范围内没有可用的学习日（全部为周末），请调整日期或取消"保留周末为休息日"选项。');
+                return;
+            }
+
+            // 根据难度调整阶段比例
+            const phaseRatios = getPhaseRatios(difficulty);
+
+            // 生成任务计划
+            const tasks = generateTasks(taskName, studyDates, restDates, phaseRatios, dailyTime, skipWeekend);
+
+            // 更新统计信息
+            document.getElementById('totalDays').textContent = allDates.length;
+            document.getElementById('studyDays').textContent = studyDates.length;
+            document.getElementById('suggestTime').textContent = dailyTime + 'h';
+
+            // 渲染计划
+            renderPlan(tasks);
+
+            // 渲染学习建议
+            renderSuggestions(difficulty, dailyTime, studyDates.length);
+
+            // 更新进度条
+            updateProgress();
+
+            // 显示结果卡片和重新生成按钮
+            document.getElementById('resultCard').classList.remove('hidden');
+            document.getElementById('regenerateBtn').classList.remove('hidden');
+
+            // 保存到本地存储
+            saveToStorage();
+
+            // 滚动到结果
+            document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 更新进度条
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.task-checkbox:not([disabled])');
+            const totalTasks = checkboxes.length;
+            const completedTasks = Array.from(checkboxes).filter(cb => cb.checked).length;
+            
+            const percent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = percent + '%';
+            document.getElementById('completedCount').textContent = completedTasks;
+            document.getElementById('totalCount').textContent = totalTasks;
+        }
+
+        // 任务复选框变化处理
+        function handleTaskChange(taskId, checkbox) {
+            taskCompletionStatus[taskId] = checkbox.checked;
+            
+            // 更新任务项样式
+            const taskItem = checkbox.closest('.task-item');
+            if (checkbox.checked) {
+                taskItem.classList.add('completed');
+            } else {
+                taskItem.classList.remove('completed');
+            }
+            
+            // 更新进度条
+            updateProgress();
+
+            // 保存到本地存储
+            saveToStorage();
+        }
+
+        // 获取日期范围内的所有日期
+        function getDatesInRange(start, end) {
+            const dates = [];
+            const current = new Date(start);
+            while (current <= end) {
+                dates.push(new Date(current));
+                current.setDate(current.getDate() + 1);
+            }
+            return dates;
+        }
+
+        // 判断是否为周末
+        function isWeekend(date) {
+            const day = date.getDay();
+            return day === 0 || day === 6;
+        }
+
+        // 格式化日期
+        function formatDate(date) {
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            return `${month}月${day}日 ${weekdays[date.getDay()]}`;
+        }
+
+        // 根据难度获取阶段比例
+        function getPhaseRatios(difficulty) {
+            switch (difficulty) {
+                case 'easy':
+                    return { collect: 0.15, understand: 0.25, draft: 0.4, review: 0.2 };
+                case 'medium':
+                    return { collect: 0.2, understand: 0.3, draft: 0.35, review: 0.15 };
+                case 'hard':
+                    return { collect: 0.2, understand: 0.35, draft: 0.3, review: 0.15 };
+                default:
+                    return { collect: 0.2, understand: 0.3, draft: 0.35, review: 0.15 };
+            }
+        }
+
+        // 生成任务内容 - 改进版：更平均的任务分配
+        function generateTasks(taskName, studyDates, restDates, ratios, dailyTime, skipWeekend) {
+            const tasks = [];
+            const totalStudyDays = studyDates.length;
+
+            // 计算各阶段天数 - 使用四舍五入而非向上取整，使分配更平均
+            function calculatePhaseDays(totalDays, ratio) {
+                const days = Math.round(totalDays * ratio);
+                // 确保每个阶段至少有1天
+                return Math.max(1, days);
+            }
+
+            let phaseDays = [
+                calculatePhaseDays(totalStudyDays, ratios.collect),
+                calculatePhaseDays(totalStudyDays, ratios.understand),
+                calculatePhaseDays(totalStudyDays, ratios.draft),
+                calculatePhaseDays(totalStudyDays, ratios.review)
+            ];
+
+            // 调整天数确保总和等于总学习天数
+            let totalAllocated = phaseDays.reduce((sum, d) => sum + d, 0);
+            let diff = totalAllocated - totalStudyDays;
+
+            // 如果分配的天数超过总天数，从天数最多的阶段减少
+            // 如果分配的天数不足总天数，给天数最少的阶段增加
+            while (diff !== 0) {
+                if (diff > 0) {
+                    // 需要减少天数，从最大的非最小阶段减少
+                    let maxIndex = 0;
+                    let maxVal = phaseDays[0];
+                    for (let i = 1; i < phaseDays.length; i++) {
+                        if (phaseDays[i] > maxVal) {
+                            maxVal = phaseDays[i];
+                            maxIndex = i;
+                        }
+                    }
+                    // 只有当天数大于1时才减少
+                    if (phaseDays[maxIndex] > 1) {
+                        phaseDays[maxIndex]--;
+                        diff--;
+                    } else {
+                        // 如果所有阶段都是1天，无法再减少
+                        break;
+                    }
+                } else {
+                    // 需要增加天数，给最小的阶段增加
+                    let minIndex = 0;
+                    let minVal = phaseDays[0];
+                    for (let i = 1; i < phaseDays.length; i++) {
+                        if (phaseDays[i] < minVal) {
+                            minVal = phaseDays[i];
+                            minIndex = i;
+                        }
+                    }
+                    phaseDays[minIndex]++;
+                    diff++;
+                }
+            }
+
+            // 构建阶段配置
+            const phases = [
+                {
+                    name: '资料收集',
+                    icon: '🔍',
+                    class: 'phase-1',
+                    days: phaseDays[0],
+                    getTask: (index, total) => getCollectTask(taskName, index, total)
+                },
+                {
+                    name: '理解内容',
+                    icon: '📖',
+                    class: 'phase-2',
+                    days: phaseDays[1],
+                    getTask: (index, total) => getUnderstandTask(taskName, index, total)
+                },
+                {
+                    name: '完成初稿',
+                    icon: '✍️',
+                    class: 'phase-3',
+                    days: phaseDays[2],
+                    getTask: (index, total) => getDraftTask(taskName, index, total)
+                },
+                {
+                    name: '修改检查',
+                    icon: '✅',
+                    class: 'phase-4',
+                    days: phaseDays[3],
+                    getTask: (index, total) => getReviewTask(taskName, index, total)
+                }
+            ];
+
+            // 合并所有日期并排序
+            const allDatesWithRest = [...studyDates.map(d => ({ date: d, isRest: false }))];
+            if (skipWeekend) {
+                restDates.forEach(d => allDatesWithRest.push({ date: d, isRest: true }));
+            }
+            allDatesWithRest.sort((a, b) => a.date - b.date);
+
+            let studyDayIndex = 0;
+
+            allDatesWithRest.forEach(item => {
+                const taskId = formatDate(item.date).replace(/\s/g, '_');
+                
+                if (item.isRest) {
+                    tasks.push({
+                        id: taskId,
+                        date: item.date,
+                        isRest: true,
+                        content: '休息日 - 调整状态，适当放松',
+                        time: 0,
+                        phase: null
+                    });
+                } else {
+                    // 找到当前学习日属于哪个阶段
+                    let currentPhase = null;
+                    let phaseDayIndex = 0;
+                    let accumulatedDays = 0;
+
+                    for (const phase of phases) {
+                        if (studyDayIndex < accumulatedDays + phase.days) {
+                            currentPhase = phase;
+                            phaseDayIndex = studyDayIndex - accumulatedDays;
+                            break;
+                        }
+                        accumulatedDays += phase.days;
+                    }
+
+                    if (currentPhase) {
+                        tasks.push({
+                            id: taskId,
+                            date: item.date,
+                            isRest: false,
+                            content: currentPhase.getTask(phaseDayIndex, currentPhase.days),
+                            time: dailyTime,
+                            phase: currentPhase
+                        });
+                    }
+                    studyDayIndex++;
+                }
+            });
+
+            return tasks;
+        }
+
+        // 资料收集阶段任务 - 根据总天数动态生成
+        function getCollectTask(taskName, index, total) {
+            const allTasks = [
+                `明确"${taskName}"的目标要求和评分标准`,
+                `搜索相关文献资料和参考资料`,
+                `整理收集到的资料并分类归档`,
+                `确定资料来源的可靠性并标注`,
+                `列出核心参考文献清单`,
+                `梳理资料的主要观点和论据`,
+                `建立资料索引便于后续查阅`
+            ];
+            
+            // 根据总天数选择任务，确保每天有不同的任务
+            if (total <= allTasks.length) {
+                // 如果天数较少，直接按索引返回
+                return allTasks[index];
+            } else {
+                // 如果天数较多，循环使用任务，并添加序号
+                const baseIndex = index % allTasks.length;
+                const cycle = Math.floor(index / allTasks.length) + 1;
+                if (cycle > 1) {
+                    return `继续${allTasks[baseIndex]}（第${cycle}轮）`;
+                }
+                return allTasks[baseIndex];
+            }
+        }
+
+        // 理解内容阶段任务
+        function getUnderstandTask(taskName, index, total) {
+            const allTasks = [
+                `阅读并理解核心参考文献`,
+                `梳理"${taskName}"的知识框架`,
+                `记录重要观点和个人理解`,
+                `分析难点并查阅补充资料`,
+                `形成初步思路和大纲框架`,
+                `总结各文献的核心论点`,
+                `对比不同观点形成自己的见解`
+            ];
+            
+            if (total <= allTasks.length) {
+                return allTasks[index];
+            } else {
+                const baseIndex = index % allTasks.length;
+                const cycle = Math.floor(index / allTasks.length) + 1;
+                if (cycle > 1) {
+                    return `继续${allTasks[baseIndex]}（第${cycle}轮）`;
+                }
+                return allTasks[baseIndex];
+            }
+        }
+
+        // 完成初稿阶段任务
+        function getDraftTask(taskName, index, total) {
+            const allTasks = [
+                `完成"${taskName}"的框架搭建`,
+                `撰写主体内容第一部分`,
+                `撰写主体内容第二部分`,
+                `补充完善细节内容`,
+                `完成初稿并整体通读`,
+                `完善开头和结尾部分`,
+                `检查段落间的逻辑衔接`
+            ];
+            
+            if (total <= allTasks.length) {
+                return allTasks[index];
+            } else {
+                const baseIndex = index % allTasks.length;
+                const cycle = Math.floor(index / allTasks.length) + 1;
+                if (cycle > 1) {
+                    return `继续${allTasks[baseIndex]}（第${cycle}轮）`;
+                }
+                return allTasks[baseIndex];
+            }
+        }
+
+        // 修改检查阶段任务
+        function getReviewTask(taskName, index, total) {
+            const allTasks = [
+                `检查内容逻辑和结构完整性`,
+                `修正语法错误和格式问题`,
+                `核对引用和参考文献`,
+                `请他人帮忙审阅并收集反馈`,
+                `最终修改并完成提交准备`,
+                `检查是否符合格式要求`,
+                `进行最后的细节优化`
+            ];
+            
+            if (total <= allTasks.length) {
+                return allTasks[index];
+            } else {
+                const baseIndex = index % allTasks.length;
+                const cycle = Math.floor(index / allTasks.length) + 1;
+                if (cycle > 1) {
+                    return `继续${allTasks[baseIndex]}（第${cycle}轮）`;
+                }
+                return allTasks[baseIndex];
+            }
+        }
+
+        // 渲染计划
+        function renderPlan(tasks) {
+            const container = document.getElementById('planContainer');
+            container.innerHTML = '';
+
+            // 按阶段分组
+            const phases = [
+                { name: '资料收集', icon: '🔍', class: 'phase-1', tasks: [] },
+                { name: '理解内容', icon: '📖', class: 'phase-2', tasks: [] },
+                { name: '完成初稿', icon: '✍️', class: 'phase-3', tasks: [] },
+                { name: '修改检查', icon: '✅', class: 'phase-4', tasks: [] }
+            ];
+
+            let currentPhaseIndex = -1;
+
+            tasks.forEach(task => {
+                if (task.isRest) {
+                    // 休息日添加到当前阶段
+                    if (currentPhaseIndex >= 0) {
+                        phases[currentPhaseIndex].tasks.push(task);
+                    }
+                } else if (task.phase) {
+                    const phaseIndex = phases.findIndex(p => p.name === task.phase.name);
+                    if (phaseIndex !== -1) {
+                        currentPhaseIndex = phaseIndex;
+                        phases[phaseIndex].tasks.push(task);
+                    }
+                }
+            });
+
+            // 渲染各阶段
+            phases.forEach(phase => {
+                if (phase.tasks.length === 0) return;
+
+                const section = document.createElement('div');
+                section.className = 'phase-section';
+
+                const header = document.createElement('div');
+                header.className = 'phase-header';
+                header.innerHTML = `
+                    <div class="phase-icon ${phase.class}">${phase.icon}</div>
+                    <div class="phase-info">
+                        <div class="phase-title">${phase.name}</div>
+                        <div class="phase-duration">${phase.tasks.filter(t => !t.isRest).length} 个学习日</div>
+                    </div>
+                `;
+                section.appendChild(header);
+
+                const taskList = document.createElement('div');
+                taskList.className = 'task-list';
+
+                phase.tasks.forEach(task => {
+                    const taskItem = document.createElement('div');
+                    taskItem.className = 'task-item';
+                    taskItem.id = 'task-' + task.id;
+                    
+                    if (task.isRest) {
+                        taskItem.innerHTML = `
+                            <input type="checkbox" class="task-checkbox" disabled>
+                            <span class="task-date rest">${formatDate(task.date)}</span>
+                            <span class="task-content">${task.content}</span>
+                            <span class="rest-badge">休息</span>
+                        `;
+                    } else {
+                        const isChecked = taskCompletionStatus[task.id] || false;
+                        if (isChecked) {
+                            taskItem.classList.add('completed');
+                        }
+                        taskItem.innerHTML = `
+                            <input type="checkbox" class="task-checkbox" 
+                                   ${isChecked ? 'checked' : ''} 
+                                   onchange="handleTaskChange('${task.id}', this)">
+                            <span class="task-date">${formatDate(task.date)}</span>
+                            <span class="task-content">${task.content}</span>
+                            <span class="task-time">${task.time}小时</span>
+                        `;
+                    }
+                    
+                    taskList.appendChild(taskItem);
+                });
+
+                section.appendChild(taskList);
+                container.appendChild(section);
+            });
+        }
+    </script>
+</body>
+</html>
